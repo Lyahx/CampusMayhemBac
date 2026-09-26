@@ -1,18 +1,35 @@
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 
-var postgres = builder.Configuration.GetConnectionString("Postgres");
+var databaseUrl = builder.Configuration["DATABASE_URL"];
 
 builder.Services.AddDbContext<ScoreDb>(options =>
 {
-    if (string.IsNullOrWhiteSpace(postgres))
+    if (string.IsNullOrWhiteSpace(databaseUrl))
         options.UseSqlite(builder.Configuration.GetConnectionString("Scores"));
     else
-        options.UseNpgsql(postgres);
+        options.UseNpgsql(ToNpgsqlConnectionString(databaseUrl));
 });
+
+static string ToNpgsqlConnectionString(string databaseUrl)
+{
+    var uri = new Uri(databaseUrl);
+    var credentials = uri.UserInfo.Split(':', 2);
+
+    return new NpgsqlConnectionStringBuilder
+    {
+        Host = uri.Host,
+        Port = uri.Port > 0 ? uri.Port : 5432,
+        Username = Uri.UnescapeDataString(credentials[0]),
+        Password = credentials.Length > 1 ? Uri.UnescapeDataString(credentials[1]) : string.Empty,
+        Database = uri.AbsolutePath.Trim('/'),
+        SslMode = SslMode.Prefer
+    }.ConnectionString;
+}
 
 var app = builder.Build();
 
