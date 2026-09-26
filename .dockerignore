@@ -1,0 +1,8 @@
+bin/
+obj/
+.git/
+.idea/
+.claude/
+*.db
+*.db-shm
+*.db-wal

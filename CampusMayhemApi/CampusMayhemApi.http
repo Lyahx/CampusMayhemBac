@@ -1,0 +1,93 @@
+@host = http://localhost:5071
+
+### 201 gecerli kayit
+POST {{host}}/scores
+Content-Type: application/json
+
+{ "playerName": "FUR", "score": 4200, "kills": 12, "deaths": 3 }
+
+### 201 ayni skor, tiebreak icin ikinci kayit
+POST {{host}}/scores
+Content-Type: application/json
+
+{ "playerName": "KAN", "score": 4200, "kills": 9, "deaths": 5 }
+
+### 201 dusuk skor
+POST {{host}}/scores
+Content-Type: application/json
+
+{ "playerName": "EGE", "score": 150, "kills": 1, "deaths": 8 }
+
+### 201 kucuk harf girdi, cevapta buyuk harf donmeli
+POST {{host}}/scores
+Content-Type: application/json
+
+{ "playerName": "abc", "score": 900, "kills": 4, "deaths": 4 }
+
+### 201 turkce locale tuzagi, cevapta III donmeli, IIIdotted degil
+POST {{host}}/scores
+Content-Type: application/json
+
+{ "playerName": "iii", "score": 800, "kills": 2, "deaths": 2 }
+
+### 400 isim iki harf
+POST {{host}}/scores
+Content-Type: application/json
+
+{ "playerName": "AB", "score": 100, "kills": 1, "deaths": 1 }
+
+### 400 isimde rakam
+POST {{host}}/scores
+Content-Type: application/json
+
+{ "playerName": "A1C", "score": 100, "kills": 1, "deaths": 1 }
+
+### 400 isim null
+POST {{host}}/scores
+Content-Type: application/json
+
+{ "playerName": null, "score": 100, "kills": 1, "deaths": 1 }
+
+### 400 negatif skor
+POST {{host}}/scores
+Content-Type: application/json
+
+{ "playerName": "FUR", "score": -5, "kills": 1, "deaths": 1 }
+
+### 400 absurd skor
+POST {{host}}/scores
+Content-Type: application/json
+
+{ "playerName": "FUR", "score": 999999999, "kills": 1, "deaths": 1 }
+
+### 400 dort alan birden hatali, errors sozlugunde dordu de gorunmeli
+POST {{host}}/scores
+Content-Type: application/json
+
+{ "playerName": "x9", "score": -1, "kills": -3, "deaths": 5000 }
+
+### 400 bozuk json, handler hic calismamali
+POST {{host}}/scores
+Content-Type: application/json
+
+{ "playerName": "FUR", "score":
+
+### 200 varsayilan limit 10
+GET {{host}}/scores/top
+Accept: application/json
+
+### 200 limit 3
+GET {{host}}/scores/top?limit=3
+Accept: application/json
+
+### 400 limit sifir
+GET {{host}}/scores/top?limit=0
+Accept: application/json
+
+### 400 limit negatif
+GET {{host}}/scores/top?limit=-1
+Accept: application/json
+
+### 400 limit ust sinir asimi
+GET {{host}}/scores/top?limit=1000
+Accept: application/json
